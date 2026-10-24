@@ -10,4 +10,4 @@ Development checklist:
 | 4.   | Camera view angle                    | Complete   |
 | 5.   | Delta seconds for FPS adaptive speed | Complete   |
 | 6.   | Rays system. Distance to objects     | Complete   |
-| 7.   | Optimize console graphics            | In process |
+| 7.   | Optimize console graphics            | Complete   |
