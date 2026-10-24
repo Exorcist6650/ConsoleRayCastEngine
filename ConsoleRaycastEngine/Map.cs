@@ -17,10 +17,6 @@ namespace ConsoleReycastEngine
         public readonly int Width { get; init; } = field.GetLength(0);
         public readonly int Height { get; init; } = field.GetLength(1);
 
-        public bool IsObstacle(int x, int y) =>
-            x < 0 || x >= Width ||
-            y < 0 || y >= Height ||
-            Field[y, x] == 1;
 
         public bool IsObstacle(Vector2 location)
         {

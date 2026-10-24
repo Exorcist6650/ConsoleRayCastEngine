@@ -81,7 +81,7 @@ namespace ConsoleReycastEngine
                     location: playerLocation,
                     rotation: 0,
                     rotationSpeed: 90,
-                    viewDistance: 3);
+                    viewDistance: 6);
 
             // Player
             var player = new Player(
@@ -91,10 +91,6 @@ namespace ConsoleReycastEngine
 
             // Manager init
             var graphicsManager = new GraphicsManager(map, player);
-
-            // Screen parameters
-            const int TargetFps = 60;
-            const int FrameTimeMs = 1000 / TargetFps;
 
             Console.CursorVisible = false; // Hide cursor
 
@@ -112,6 +108,13 @@ namespace ConsoleReycastEngine
                 // Buttons handler
                 InputHandler(player, map, deltaSeconds);
 
+                // Cast ray forward
+                var distanceForward = Tools.TryGetDistanceToObstacle(
+                        map, 
+                        player.CameraComponent.Location,
+                        player.CameraComponent.ViewAngle, 
+                        player.CameraComponent.ViewDistance);
+
                 // Map display
                 graphicsManager.ClearDisplay();
                 graphicsManager.Display2D();
@@ -121,9 +124,10 @@ namespace ConsoleReycastEngine
 
                 Console.WriteLine($"FPS: {1000 / deltaTime.Milliseconds}");
 
+                Console.WriteLine($"Distance to obstacle front: {distanceForward}");
+
                 Thread.Sleep(1); // Frame waiting
             }
-
         }
     }
 }

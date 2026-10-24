@@ -9,12 +9,28 @@ namespace ConsoleReycastEngine.core
 {
     public static class Tools
     {
+        public static int TryGetDistanceToObstacle(Map map, Vector2 rayStart, float rayAngle, float rayLength)
+        {
+            for (int currentDistance = 1;
+                currentDistance <= (int)Math.Round(rayLength);
+                currentDistance++)
+            {
+                var rayLocation =
+                    Tools.GetVectorEndLocation(rayStart, rayAngle, currentDistance);
+
+                // Return distance to obstacle
+                if (map.IsObstacle(rayLocation))
+                    return currentDistance - 1;
+            }
+            return -1; // Not obstacle
+        }
+
         public static Vector2 GetVectorEndLocation(
             Vector2 startPosition,
-            float rotation,
+            float angle,
             float length)
         {
-            var viewRadians = rotation * Math.PI / 180.0f;
+            var viewRadians = angle * Math.PI / 180.0f;
 
             // End view location
             float endX = (float)

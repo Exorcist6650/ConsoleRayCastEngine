@@ -52,5 +52,13 @@ namespace ConsoleReycastEngine
                     break;
             }
         }
+        
+        /// <summary>
+        /// Casts ray and try to find distance to obstacle
+        /// </summary>
+        /// <param name="map"></param>
+        /// <param name="rayAngle"></param>
+        /// <param name="rayLength"></param>
+        /// <returns>Distance to obstacle. Otherwise -1</returns>
     }
 }
