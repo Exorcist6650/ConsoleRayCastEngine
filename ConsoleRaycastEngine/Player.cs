@@ -48,7 +48,6 @@ namespace ConsoleReycastEngine
 
             Location = newLocation; // Update self location
             CameraComponent.Location = newLocation; // Update camera location
-            CameraComponent.CalculateRayLocation(); // Update view ray
 
             return true; // If player was moved
         }
@@ -61,8 +60,6 @@ namespace ConsoleReycastEngine
             // Rotate camera
             CameraComponent.Rotate(direction, deltaSeconds); 
 
-            // Update view ray
-            CameraComponent.CalculateRayLocation(); 
         }
     }
 }

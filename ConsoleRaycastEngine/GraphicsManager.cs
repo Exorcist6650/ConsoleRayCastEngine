@@ -25,20 +25,39 @@ namespace ConsoleReycastEngine
             var matrix = (int[,])_map.Field.Clone();
 
             // Add player to field
+            char playerSymbol = _player.CameraComponent.ViewAngle switch
+            {
+                >= 337.5f or < 22.5f => '-',
+                >= 22.5f and < 67.5f => '\\',
+                >= 67.5f and < 112.5f => '|',
+                >= 112.5f and < 157.5f => '/',
+                >= 157.5f and < 202.5f => '-',
+                >= 202.5f and < 247.5f => '\\',
+                >= 247.5f and < 292.5f => '|',
+                >= 292.5f and < 337.5f => '/',
+                _ => 'X'
+            };
+
+            // Add player to matrix
             matrix[(int)Math.Round(_player.Location.Y), 
                 (int)Math.Round(_player.Location.X)] = 2; 
 
-            // Draw view ray
-            if (!_map.IsObstacle(_player.CameraComponent.RayLocation))
-                matrix[(int)Math.Round(_player.CameraComponent.RayLocation.Y), 
-                    (int)Math.Round(_player.CameraComponent.RayLocation.X)] = 2;
 
             // Display game field
-            for (int i = 0; i < matrix.GetLength(1); i++)
+            for (int y = 0; y < matrix.GetLength(1); y++)
             {
-                for (int j = 0; j < matrix.GetLength(0); j++)
+                for (int x = 0; x < matrix.GetLength(0); x++)
                 {
-                    Console.Write(matrix[i, j]); // Symbols displaying
+                    // Map symbol from int
+                    char mapSymbol = matrix[y, x] switch
+                    {
+                        0 => '.',
+                        1 => '=',
+                        2 => playerSymbol,
+                        _ => '?'
+                    };
+
+                    Console.Write(mapSymbol); // Symbols displaying
                     Console.Write(' ');
                 }
                 Console.WriteLine(); // New line

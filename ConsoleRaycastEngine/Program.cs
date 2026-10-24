@@ -119,11 +119,7 @@ namespace ConsoleReycastEngine
                 // DEBUG INFO
                 Console.WriteLine($"View angle: {player.CameraComponent.ViewAngle}");
 
-                Console.WriteLine($"Ray X | Y: {player.CameraComponent.RayLocation.X} | " +
-                                  $"{player.CameraComponent.RayLocation.Y}");
-
                 Console.WriteLine($"FPS: {1000 / deltaTime.Milliseconds}");
-
 
                 Thread.Sleep(1); // Frame waiting
             }

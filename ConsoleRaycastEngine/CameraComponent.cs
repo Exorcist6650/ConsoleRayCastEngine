@@ -23,8 +23,6 @@ namespace ConsoleReycastEngine
             ViewAngle = Tools.NormalizeAngle(rotation);
             RotationSpeed = rotationSpeed;
             ViewDistance = viewDistance;
-
-            CalculateRayLocation(); // View ray location
         }
 
         // Props
@@ -35,10 +33,6 @@ namespace ConsoleReycastEngine
         public float RotationSpeed { get; set; }
 
         public float ViewDistance { get; } 
-
-        public Vector2 RayLocation { get; private set; }
-
-
 
         // PUBLIC 
         public void Rotate(
@@ -58,9 +52,5 @@ namespace ConsoleReycastEngine
                     break;
             }
         }
-
-        public void CalculateRayLocation() =>
-            RayLocation = Tools.GetVectorEndLocation(
-                Location, ViewAngle, ViewDistance);
     }
 }
