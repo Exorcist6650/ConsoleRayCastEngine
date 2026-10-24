@@ -50,23 +50,11 @@ namespace ConsoleReycastEngine
 
         public static void Main()
         {
-            int[,] field = { 
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            };
+            int[,] field = new int[15, 30];
+
+            field[1, 4] = 1;
+            field[1, 5] = 1;
+            field[1, 6] = 1;
 
             // INITIALIZATION OBJECTS
 
@@ -90,9 +78,8 @@ namespace ConsoleReycastEngine
                 speed: 3f);
 
             // Manager init
-            var graphicsManager = new GraphicsManager(map, player);
-
-            Console.CursorVisible = false; // Hide cursor
+            var graphicsManager = new GraphicsManager(map, player, 100, 100);
+            graphicsManager.Init();
 
             DateTime lastTime = new();
             // Main loop
@@ -115,16 +102,18 @@ namespace ConsoleReycastEngine
                         player.CameraComponent.ViewAngle, 
                         player.CameraComponent.ViewDistance);
 
-                // Map display
-                graphicsManager.ClearDisplay();
-                graphicsManager.Display2D();
+                // RENDER
 
-                // DEBUG INFO
-                Console.WriteLine($"View angle: {player.CameraComponent.ViewAngle}");
+                // Add 2d to render buffer
+                graphicsManager.Add2dMapToBuffer();
 
-                Console.WriteLine($"FPS: {1000 / deltaTime.Milliseconds}");
+                // Add debug text to render buffer
+                graphicsManager.AddDebugInfoToBuffer(0, map.Height,
+                    $"FPS: {1000 / deltaTime.Milliseconds}",
+                    $"View angle: {player.CameraComponent.ViewAngle}",
+                    $"Distance to obstacle front: {distanceForward}");
 
-                Console.WriteLine($"Distance to obstacle front: {distanceForward}");
+                graphicsManager.DisplayBuffer(); // Draw
 
                 Thread.Sleep(1); // Frame waiting
             }

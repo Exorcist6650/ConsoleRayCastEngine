@@ -49,7 +49,7 @@ namespace ConsoleReycastEngine.core
         {
             Direction.Forward => 0,
             Direction.Backward => 180,
-            Direction.Left => -90,
+            Direction.Left => 270,
             Direction.Right => 90,
             _ => throw new ArgumentException("Not valid direction")
         };

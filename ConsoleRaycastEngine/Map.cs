@@ -14,8 +14,8 @@ namespace ConsoleReycastEngine
         public int[,] Field { get; set; } = field;
 
         // Parameters
-        public readonly int Width { get; init; } = field.GetLength(0);
-        public readonly int Height { get; init; } = field.GetLength(1);
+        public readonly int Width { get; init; } = field.GetLength(1);
+        public readonly int Height { get; init; } = field.GetLength(0);
 
 
         public bool IsObstacle(Vector2 location)
