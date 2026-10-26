@@ -1,4 +1,5 @@
-﻿This is a console graphics raycast engine that I write as my pet project.
+﻿
+This is a console graphics raycast engine that I write as my pet project.
 
 Development checklist:
 
@@ -11,3 +12,4 @@ Development checklist:
 | 5.   | Delta seconds for FPS adaptive speed | Complete   |
 | 6.   | Rays system. Distance to objects     | Complete   |
 | 7.   | Optimize console graphics            | Complete   |
+| 8.   | 3D illusion draw method              | In process |
