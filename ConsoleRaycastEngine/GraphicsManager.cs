@@ -9,38 +9,29 @@ namespace ConsoleReycastEngine
         private readonly Player _player;
 
         // States
-        public int ScreenHeight { get; init; }
-        public int ScreenWidth { get; init; }
+        public int ScreenHeight { get; init; } = Console.BufferHeight;
+        public int ScreenWidth { get; init; } = Console.BufferWidth;
 
         private char[,] _previousBuffer;
         private char[,] _currentBuffer;
-
+        
         private bool _isInit = false;
 
 
         public GraphicsManager(
             Map map, 
-            Player player, 
-            int screenHeight, 
-            int screenWidth)
+            Player player)
         {
             // Checking for empty field
-            if (map.Height == 0 && map.Width == 0) 
-                throw new ArgumentNullException("Field is empty");
-
-            if (screenHeight <= 0 && screenWidth <= 0)
-                throw new ArgumentNullException("Invalid screen format");
+            if (map.Height == 0 || map.Width == 0)
+                throw new ArgumentException("Field is empty");
 
             _map = map;
             _player = player;
-
-            ScreenHeight = screenHeight;
-            ScreenWidth = screenWidth;
-
-            
         }
 
         // METHODS
+
 
         public void Init()
         {
@@ -53,30 +44,62 @@ namespace ConsoleReycastEngine
                 for (int j = 0; j < ScreenWidth; j++)
                 {
                     _previousBuffer[i, j] = ' ';
-                    _currentBuffer[i, j] = ' ';
+                    _currentBuffer[i, j] = '.';
                 }
 
-            try
-            {
-                // Set size to screen
-                Console.WindowHeight = ScreenHeight;
-                Console.WindowWidth = ScreenWidth;
-
-                Console.CursorVisible = false; // Hide cursor
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
+            // Hide cursor
+            Console.CursorVisible = false; 
 
             // Switch status
             _isInit = true;
         }
+
+
+        // Displaying 3D 
+        public void Add3dToBuffer(params IList<int> distances)
+        {
+            if (!_isInit)
+                throw new InvalidOperationException("Manager is not init");
+
+            var screenSegmentsAmount = distances.Count;
+            var segmentWidth = ScreenWidth / screenSegmentsAmount;
+
+            for (int i = 0; i < distances.Count; i++)
+            {
+                if (distances[i] == -1) return;
+
+                // Height in float
+                float targetHeight = ScreenHeight / (distances[i] + 1f);
+
+                // Smooth height
+                int wallHeight = (int)Math.Round(targetHeight);
+                int wallWidth = segmentWidth;
+
+                int widthCenter = (i * segmentWidth) + segmentWidth / 2;
+                int heightCenter = ScreenHeight / 2;
+
+                int halfWidth = wallWidth / 2;
+                int halfHeight = wallHeight / 2;
+
+                for (int y = heightCenter - halfHeight; y < heightCenter + halfHeight; y++)
+                {
+                    for (int x = widthCenter - halfWidth; x < widthCenter + halfWidth; x++)
+                    {
+                        _currentBuffer[y, x] = '|';
+                    }
+                }
+            }
+        }
+
+
         // Displaying map on 2D
         public void Add2dMapToBuffer() 
         {
             if (!_isInit) 
                 throw new InvalidOperationException("Manager is not init");
+
+            if (_map.Height > ScreenHeight || _map.Width > ScreenWidth)
+                throw new ArgumentException("Map is bigger than screen");
 
             var matrix = (int[,])_map.Field.Clone();
 
@@ -107,7 +130,7 @@ namespace ConsoleReycastEngine
                     // Map symbol from int
                     char mapSymbol = matrix[y, x] switch
                     {
-                        0 => '.',
+                        0 => '`',
                         1 => '=',
                         2 => playerSymbol,
                         _ => '?'
@@ -117,6 +140,7 @@ namespace ConsoleReycastEngine
                 }
             }
         }
+
 
         public void AddDebugInfoToBuffer(
             int x, int y, params string[] textLines)
@@ -130,35 +154,35 @@ namespace ConsoleReycastEngine
                 for (int c = 0; c < textLines[l].Length; c++)
                 {
                     char currentLetter = currentLine[c];
+                    int letterPositionX = x + c;
+                    int letterPositionY = y + l;
 
                     // Checking screen sizes
-                    if (x >= 0 && x < ScreenWidth && y >= 0 && y < ScreenWidth)
+                    if (letterPositionX >= 0 && letterPositionX < ScreenWidth && 
+                        letterPositionY >= 0 && letterPositionY < ScreenHeight)
                     {
                         // Add letters to buffer
-                        _currentBuffer[y + l, x + c] = currentLetter;
-                    }
-                }
-
-                // Clear previous symbols
-                for (int lineOffset = currentLine.Length; 
-                    lineOffset < ScreenWidth; 
-                    lineOffset++)
-                {
-                    // Checking screen sizes
-                    if (x >= 0 && x < ScreenWidth && y >= 0 && y < ScreenWidth)
-                    {
-                        // Empty symbols
-                        _currentBuffer[y + l, x + lineOffset] = ' ';
+                        _currentBuffer[letterPositionY, letterPositionX] 
+                            = currentLetter;
                     }
                 }
             }
         }
 
+
+        public void ClearBuffer()
+        {
+            for (int i = 0; i < ScreenHeight; i++)
+                for (int j = 0; j < ScreenWidth; j++)
+                    _currentBuffer[i, j] = '.';
+        }
+
+
         public void DisplayBuffer()
         {
             for (int y = 0; y < ScreenHeight; y++)
             {
-                for (int x = 0; x < ScreenHeight; x++)
+                for (int x = 0; x < ScreenWidth; x++)
                 {
                     // Update only differents elements
                     if (_previousBuffer[y, x] != _currentBuffer[y, x])

@@ -69,7 +69,8 @@ namespace ConsoleReycastEngine
                     location: playerLocation,
                     rotation: 0,
                     rotationSpeed: 90,
-                    viewDistance: 6);
+                    viewDistance: 15,
+                    fieldOfView: 90);
 
             // Player
             var player = new Player(
@@ -78,7 +79,7 @@ namespace ConsoleReycastEngine
                 speed: 3f);
 
             // Manager init
-            var graphicsManager = new GraphicsManager(map, player, 100, 100);
+            var graphicsManager = new GraphicsManager(map, player);
             graphicsManager.Init();
 
             DateTime lastTime = new();
@@ -95,23 +96,58 @@ namespace ConsoleReycastEngine
                 // Buttons handler
                 InputHandler(player, map, deltaSeconds);
 
-                // Cast ray forward
-                var distanceForward = Tools.TryGetDistanceToObstacle(
-                        map, 
+
+                // CALCULATE RAYS
+
+                // Rays that camera spawns
+                int raysAmount = 30; 
+
+                // Step between rays
+                float rayStep = raysAmount > 1 
+                    ? player.CameraComponent.FOV / (raysAmount - 1) 
+                    : 0f;
+
+                // Offset to start
+                float startAngleOffset = raysAmount > 1
+                    ? -(player.CameraComponent.FOV / 2f)
+                    : 0f;
+
+                // Distance results of all rays
+                List<int> raysDistances = new();
+
+                // Calculate distance to all rays
+                for (int i = 0; i < raysAmount; i++)
+                {
+                    // Ray rotation include camera rotation
+                    float currentRayAngle = player.CameraComponent.ViewAngle +
+                        (startAngleOffset + (rayStep * i));
+
+                    // Ray distance to obstacle
+                    var currentRayDistance = Tools.TryGetDistanceToObstacle(
+                        map,
                         player.CameraComponent.Location,
-                        player.CameraComponent.ViewAngle, 
+                        currentRayAngle,
                         player.CameraComponent.ViewDistance);
+
+                    raysDistances.Add(currentRayDistance);
+                }
 
                 // RENDER
 
-                // Add 2d to render buffer
-                graphicsManager.Add2dMapToBuffer();
 
                 // Add debug text to render buffer
-                graphicsManager.AddDebugInfoToBuffer(0, map.Height,
-                    $"FPS: {1000 / deltaTime.Milliseconds}",
-                    $"View angle: {player.CameraComponent.ViewAngle}",
-                    $"Distance to obstacle front: {distanceForward}");
+                //graphicsManager.AddDebugInfoToBuffer(0, map.Height,
+                //    $"FPS: {1000 / deltaTime.Milliseconds}",
+                //    $"View angle: {player.CameraComponent.ViewAngle}",
+                //    $"Distance to obstacle front: {distanceForward}");
+
+                graphicsManager.ClearBuffer(); // Clear
+
+                // Add camera view in 3d
+                graphicsManager.Add3dToBuffer(raysDistances);
+
+                // Add 2d to render buffer
+                graphicsManager.Add2dMapToBuffer();
 
                 graphicsManager.DisplayBuffer(); // Draw
 

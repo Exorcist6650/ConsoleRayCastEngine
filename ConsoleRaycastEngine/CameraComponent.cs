@@ -16,13 +16,15 @@ namespace ConsoleReycastEngine
             Vector2 location,
             int rotation,
             int rotationSpeed,
-            float viewDistance)
+            float viewDistance,
+            int fieldOfView)
         {
             Location = location;
 
             ViewAngle = Tools.NormalizeAngle(rotation);
             RotationSpeed = rotationSpeed;
             ViewDistance = viewDistance;
+            FOV = fieldOfView;
         }
 
         // Props
@@ -33,6 +35,8 @@ namespace ConsoleReycastEngine
         public float RotationSpeed { get; set; }
 
         public float ViewDistance { get; } 
+
+        public float FOV { get; } 
 
         // PUBLIC 
         public void Rotate(
@@ -52,13 +56,5 @@ namespace ConsoleReycastEngine
                     break;
             }
         }
-        
-        /// <summary>
-        /// Casts ray and try to find distance to obstacle
-        /// </summary>
-        /// <param name="map"></param>
-        /// <param name="rayAngle"></param>
-        /// <param name="rayLength"></param>
-        /// <returns>Distance to obstacle. Otherwise -1</returns>
     }
 }
