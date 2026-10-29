@@ -50,11 +50,24 @@ namespace ConsoleReycastEngine
 
         public static void Main()
         {
-            int[,] field = new int[15, 30];
-
-            field[1, 4] = 1;
-            field[1, 5] = 1;
-            field[1, 6] = 1;
+            int[,] field =
+            {
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            };
 
             // INITIALIZATION OBJECTS
 
@@ -69,7 +82,7 @@ namespace ConsoleReycastEngine
                     location: playerLocation,
                     rotation: 0,
                     rotationSpeed: 90,
-                    viewDistance: 15,
+                    viewDistance: 20,
                     fieldOfView: 90);
 
             // Player
@@ -100,7 +113,7 @@ namespace ConsoleReycastEngine
                 // CALCULATE RAYS
 
                 // Rays that camera spawns
-                int raysAmount = 30; 
+                int raysAmount = 60; 
 
                 // Step between rays
                 float rayStep = raysAmount > 1 
@@ -113,14 +126,15 @@ namespace ConsoleReycastEngine
                     : 0f;
 
                 // Distance results of all rays
-                List<int> raysDistances = new();
+                List<(int distance, float angle)> raysDistances = new();
 
                 // Calculate distance to all rays
                 for (int i = 0; i < raysAmount; i++)
                 {
                     // Ray rotation include camera rotation
-                    float currentRayAngle = player.CameraComponent.ViewAngle +
-                        (startAngleOffset + (rayStep * i));
+                    float currentRayAngle = Tools.NormalizeAngle(
+                        player.CameraComponent.ViewAngle +
+                        (startAngleOffset + (rayStep * i)));
 
                     // Ray distance to obstacle
                     var currentRayDistance = Tools.TryGetDistanceToObstacle(
@@ -129,7 +143,8 @@ namespace ConsoleReycastEngine
                         currentRayAngle,
                         player.CameraComponent.ViewDistance);
 
-                    raysDistances.Add(currentRayDistance);
+                    var deltaRayAngle = player.CameraComponent.ViewAngle - currentRayAngle;
+                    raysDistances.Add((currentRayDistance, deltaRayAngle));
                 }
 
                 // RENDER

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,7 +17,7 @@ namespace ConsoleReycastEngine.core
                 currentDistance++)
             {
                 var rayLocation =
-                    Tools.GetVectorEndLocation(rayStart, rayAngle, currentDistance);
+                    GetVectorEndLocation(rayStart, rayAngle, currentDistance);
 
                 // Return distance to obstacle
                 if (map.IsObstacle(rayLocation))
@@ -44,6 +45,10 @@ namespace ConsoleReycastEngine.core
 
         public static float NormalizeAngle(float angle) =>
             (angle % 360 + 360) % 360;
+
+        public static float ToRadians(float angle) =>
+            (float)(angle * Math.PI / 180.0f);
+
 
         public static int GetAngleByDirection(Direction direction) => direction switch
         {

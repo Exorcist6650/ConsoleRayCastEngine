@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using ConsoleReycastEngine.core;
+using System.Numerics;
 
 namespace ConsoleReycastEngine
 {
@@ -56,36 +57,62 @@ namespace ConsoleReycastEngine
 
 
         // Displaying 3D 
-        public void Add3dToBuffer(params IList<int> distances)
+        public void Add3dToBuffer(params IList<(int distance, float angle)> rays)
         {
             if (!_isInit)
                 throw new InvalidOperationException("Manager is not init");
 
-            var screenSegmentsAmount = distances.Count;
+            var screenSegmentsAmount = rays.Count;
             var segmentWidth = ScreenWidth / screenSegmentsAmount;
 
-            for (int i = 0; i < distances.Count; i++)
+            for (int i = 0; i < rays.Count; i++)
             {
-                if (distances[i] == -1) return;
+                var ray = rays[i];
+
+                if (ray.distance == -1) continue;
+
+                // Ray rotation to radians 
+                var rayRotationRadians = Tools.ToRadians((ray.angle));
+                
+                // Distance with fixing fish-eye effect
+                float currentDistance = (float)
+                    (ray.distance * Math.Cos(rayRotationRadians));
+
+                char wallSymbol = (int)Math.Round(currentDistance) switch
+                {
+                    0 => '█',
+                    1 => '█',
+                    2 => '▓',
+                    3 => '▓',
+                    4 => '▒',
+                    5 => '▒',
+                    _ => '░',
+                };
 
                 // Height in float
-                float targetHeight = ScreenHeight / (distances[i] + 1f);
+                float targetHeight = ScreenHeight / (currentDistance + 1f);
 
                 // Smooth height
-                int wallHeight = (int)Math.Round(targetHeight);
+                float wallHeight = targetHeight;
                 int wallWidth = segmentWidth;
 
                 int widthCenter = (i * segmentWidth) + segmentWidth / 2;
                 int heightCenter = ScreenHeight / 2;
 
+                float halfHeight = wallHeight / 2f;
                 int halfWidth = wallWidth / 2;
-                int halfHeight = wallHeight / 2;
 
-                for (int y = heightCenter - halfHeight; y < heightCenter + halfHeight; y++)
+
+                int yStart = (int)Math.Floor(heightCenter - halfHeight);
+                int yEnd = (int)Math.Ceiling(heightCenter + halfHeight);
+                int xStart = Math.Max(0, widthCenter - halfWidth);
+                int xEnd = Math.Min(ScreenWidth - 1, widthCenter + halfWidth);
+
+                for (int y = yStart; y < yEnd; y++)
                 {
-                    for (int x = widthCenter - halfWidth; x < widthCenter + halfWidth; x++)
+                    for (int x = xStart; x < xEnd; x++)
                     {
-                        _currentBuffer[y, x] = '|';
+                        _currentBuffer[y, x] = wallSymbol;
                     }
                 }
             }
