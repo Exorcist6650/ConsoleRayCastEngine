@@ -12,4 +12,6 @@ Development checklist:
 | 5.   | Delta seconds for FPS adaptive speed | Complete   |
 | 6.   | Rays system. Distance to objects     | Complete   |
 | 7.   | Optimize console graphics            | Complete   |
-| 8.   | 3D illusion draw method              | In process |
+| 8.   | 3D illusion draw method              | Complete   |
+| 9.   | Wall edges in draw                   | In process |
+
