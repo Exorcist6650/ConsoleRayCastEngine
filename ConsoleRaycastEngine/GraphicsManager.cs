@@ -45,7 +45,7 @@ namespace ConsoleReycastEngine
                 for (int j = 0; j < ScreenWidth; j++)
                 {
                     _previousBuffer[i, j] = ' ';
-                    _currentBuffer[i, j] = '.';
+                    _currentBuffer[i, j] = ' ';
                 }
 
             // Hide cursor
@@ -65,6 +65,7 @@ namespace ConsoleReycastEngine
             var screenSegmentsAmount = rays.Count;
             var segmentWidth = ScreenWidth / screenSegmentsAmount;
 
+            // Draw walls
             for (int i = 0; i < rays.Count; i++)
             {
                 var ray = rays[i];
@@ -90,7 +91,7 @@ namespace ConsoleReycastEngine
                 };
 
                 // Height in float
-                float targetHeight = ScreenHeight / (currentDistance + 1f);
+                float targetHeight = ScreenHeight / (Math.Max(1, currentDistance));
 
                 // Smooth height
                 float wallHeight = targetHeight;
@@ -108,6 +109,7 @@ namespace ConsoleReycastEngine
                 int xStart = Math.Max(0, widthCenter - halfWidth);
                 int xEnd = Math.Min(ScreenWidth - 1, widthCenter + halfWidth);
 
+                // Draw walls
                 for (int y = yStart; y < yEnd; y++)
                 {
                     for (int x = xStart; x < xEnd; x++)
@@ -128,7 +130,7 @@ namespace ConsoleReycastEngine
             if (_map.Height > ScreenHeight || _map.Width > ScreenWidth)
                 throw new ArgumentException("Map is bigger than screen");
 
-            var matrix = (int[,])_map.Field.Clone();
+            var matrix = (char[,])_map.Field.Clone();
 
             // Add player to field
             char playerSymbol = _player.CameraComponent.ViewAngle switch
@@ -146,7 +148,7 @@ namespace ConsoleReycastEngine
 
             // Add player to matrix
             matrix[(int)Math.Round(_player.Location.Y), 
-                (int)Math.Round(_player.Location.X)] = 2; 
+                (int)Math.Round(_player.Location.X)] = playerSymbol; 
 
 
             // Add map to console buffer
@@ -154,16 +156,7 @@ namespace ConsoleReycastEngine
             {
                 for (int x = 0; x < matrix.GetLength(1); x++)
                 {
-                    // Map symbol from int
-                    char mapSymbol = matrix[y, x] switch
-                    {
-                        0 => '`',
-                        1 => '=',
-                        2 => playerSymbol,
-                        _ => '?'
-                    };
-
-                    _currentBuffer[y, x] = mapSymbol;
+                    _currentBuffer[y, x] = matrix[y, x];
                 }
             }
         }
@@ -201,7 +194,7 @@ namespace ConsoleReycastEngine
         {
             for (int i = 0; i < ScreenHeight; i++)
                 for (int j = 0; j < ScreenWidth; j++)
-                    _currentBuffer[i, j] = '.';
+                    _currentBuffer[i, j] = ' ';
         }
 
 

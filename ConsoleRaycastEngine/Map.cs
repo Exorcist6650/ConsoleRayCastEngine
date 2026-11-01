@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace ConsoleReycastEngine
 {
-    public struct Map(int[,] field)
+    public struct Map(char[,] field)
     {
         // Matrix
-        public int[,] Field { get; set; } = field;
+        public char[,] Field { get; set; } = field;
 
         // Parameters
         public readonly int Width { get; init; } = field.GetLength(1);
@@ -25,7 +25,7 @@ namespace ConsoleReycastEngine
 
             return x < 0 || x >= Width || 
                 y < 0 || y >= Height || 
-                Field[y, x] == 1;
+                Field[y, x] == '#';
         }
     }
 }
