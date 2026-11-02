@@ -14,6 +14,6 @@ Development checklist:
 | 7.   | Optimize console graphics            | Complete   |
 | 8.   | 3D illusion draw method              | Complete   |
 | 9.   | Wall edges in draw                   | Canceled   |
-| 10.  | Code refactor. Add new modules       | In process |
-| 11.  | JSON configurating. Application build| In process |
+| 10.  | Code refactor. Add new modules       | Complete   |
+| 11.  | JSON configurating. Application build| Complete   |
 
