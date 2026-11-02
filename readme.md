@@ -13,5 +13,7 @@ Development checklist:
 | 6.   | Rays system. Distance to objects     | Complete   |
 | 7.   | Optimize console graphics            | Complete   |
 | 8.   | 3D illusion draw method              | Complete   |
-| 9.   | Wall edges in draw                   | In process |
+| 9.   | Wall edges in draw                   | Canceled   |
+| 10.  | Code refactor. Add new modules       | In process |
+| 11.  | JSON configurating. Application build| In process |
 
