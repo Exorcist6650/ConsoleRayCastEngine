@@ -1,9 +1,8 @@
-﻿using ConsoleReycastEngine.core;
-using System;
+﻿using ConsoleRaycastEngine.core;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
-namespace ConsoleReycastEngine
+namespace ConsoleRaycastEngine
 {
     class Program 
     {
@@ -48,6 +47,53 @@ namespace ConsoleReycastEngine
             if (escape_key) Environment.Exit(0);
         }
 
+
+        public static List<int> CalculateDistancesByRays(Player player, Map map, int raysAmount)
+        {
+            // Step between rays
+            float rayStep = raysAmount > 1
+                ? player.CameraComponent.FOV / (raysAmount - 1)
+                : 0f;
+
+            // Offset to start
+            float startAngleOffset = raysAmount > 1
+                ? -(player.CameraComponent.FOV / 2f)
+                : 0f;
+
+            // Distance results of all rays
+            //List<(int distance, float angle)> raysDistances = [];
+            List<int> raysDistances = [];
+
+            // Calculate distance to all rays
+            for (int i = 0; i < raysAmount; i++)
+            {
+                // Ray rotation include camera rotation
+                float currentRayAngle = player.CameraComponent.ViewAngle +
+                    (startAngleOffset + (rayStep * i));
+
+                var deltaRayAngle = player.CameraComponent.ViewAngle - currentRayAngle;
+
+                // Ray distance to obstacle
+                var distanceToWall = Tools.TryGetDistanceToObstacle(
+                    map,
+                    player.CameraComponent.Location,
+                    currentRayAngle,
+                    player.CameraComponent.ViewDistance);
+
+                // Delta rotation to radians 
+                var rayRotationRadians = Tools.ToRadians(deltaRayAngle);
+
+                // Distance with fixing fish-eye effect
+                int normalizedDistance = (int)Math.Round
+                    (distanceToWall * Math.Cos(rayRotationRadians));
+
+                raysDistances.Add(normalizedDistance);
+            }
+
+            return raysDistances;
+        }
+
+
         public static void Main()
         {
             char[,] field =
@@ -83,7 +129,7 @@ namespace ConsoleReycastEngine
                     rotation: 0,
                     rotationSpeed: 80,
                     viewDistance: 20,
-                    fieldOfView: 110);
+                    fieldOfView: 90);
 
             // Player
             var player = new Player(
@@ -109,60 +155,20 @@ namespace ConsoleReycastEngine
                 // Buttons handler
                 InputHandler(player, map, deltaSeconds);
 
-
-                // CALCULATE RAYS
-
-                // Rays that camera spawns
-                int raysAmount = 60; 
-
-                // Step between rays
-                float rayStep = raysAmount > 1 
-                    ? player.CameraComponent.FOV / (raysAmount - 1) 
-                    : 0f;
-
-                // Offset to start
-                float startAngleOffset = raysAmount > 1
-                    ? -(player.CameraComponent.FOV / 2f)
-                    : 0f;
-
-                // Distance results of all rays
-                List<(int distance, float angle)> raysDistances = new();
-
-                // Calculate distance to all rays
-                for (int i = 0; i < raysAmount; i++)
-                {
-                    // Ray rotation include camera rotation
-                    float currentRayAngle = Tools.NormalizeAngle(
-                        player.CameraComponent.ViewAngle +
-                        (startAngleOffset + (rayStep * i)));
-
-                    // Ray distance to obstacle
-                    var currentRayDistance = Tools.TryGetDistanceToObstacle(
-                        map,
-                        player.CameraComponent.Location,
-                        currentRayAngle,
-                        player.CameraComponent.ViewDistance);
-
-                    var deltaRayAngle = player.CameraComponent.ViewAngle - currentRayAngle;
-                    raysDistances.Add((currentRayDistance, deltaRayAngle));
-                }
+                // Calculate rays
+                var raysDistances = CalculateDistancesByRays(player, map, 60);
 
                 // RENDER
-
-
-                // Add debug text to render buffer
-                //graphicsManager.AddDebugInfoToBuffer(0, map.Height,
-                //    $"FPS: {1000 / deltaTime.Milliseconds}",
-                //    $"View angle: {player.CameraComponent.ViewAngle}",
-                //    $"Distance to obstacle front: {distanceForward}");
 
                 graphicsManager.ClearBuffer(); // Clear
 
                 // Add camera view in 3d
-                graphicsManager.Add3dToBuffer(raysDistances);
+                graphicsManager.AddViewToBuffer(raysDistances);
 
-                // Add 2d to render buffer
-                graphicsManager.Add2dMapToBuffer();
+                // Add debug text to render buffer
+                graphicsManager.AddDebugInfoToBuffer(0, 0,
+                    $"FPS: {1000 / deltaTime.Milliseconds}",
+                    $"View angle: {player.CameraComponent.ViewAngle}");
 
                 graphicsManager.DisplayBuffer(); // Draw
 

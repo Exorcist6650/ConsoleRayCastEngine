@@ -1,7 +1,6 @@
-﻿using ConsoleReycastEngine.core;
-using System.Numerics;
+﻿using ConsoleRaycastEngine.core;
 
-namespace ConsoleReycastEngine
+namespace ConsoleRaycastEngine
 {
     public class GraphicsManager
     {
@@ -57,59 +56,49 @@ namespace ConsoleReycastEngine
 
 
         // Displaying 3D 
-        public void Add3dToBuffer(params IList<(int distance, float angle)> rays)
+        public void AddViewToBuffer(IList<int> distances)
         {
-            if (!_isInit)
-                throw new InvalidOperationException("Manager is not init");
+            int screenSegmentsAmount = distances.Count;
+            int segmentWidth = ScreenWidth / screenSegmentsAmount;
 
-            var screenSegmentsAmount = rays.Count;
-            var segmentWidth = ScreenWidth / screenSegmentsAmount;
-
-            // Draw walls
-            for (int i = 0; i < rays.Count; i++)
+            for (int i = 0; i < distances.Count; i++)
             {
-                var ray = rays[i];
+                // Skip rays without collision
+                if (distances[i] == -1) continue;
 
-                if (ray.distance == -1) continue;
-
-                // Ray rotation to radians 
-                var rayRotationRadians = Tools.ToRadians((ray.angle));
-                
-                // Distance with fixing fish-eye effect
-                float currentDistance = (float)
-                    (ray.distance * Math.Cos(rayRotationRadians));
-
-                char wallSymbol = (int)Math.Round(currentDistance) switch
+                char wallSymbol = distances[i] switch
                 {
                     0 => '█',
                     1 => '█',
                     2 => '▓',
-                    3 => '▓',
-                    4 => '▒',
-                    5 => '▒',
-                    _ => '░',
+                    3 => '▒',
+                    4 => '░',
+                    5 => '░',
+                    6 => '░',
+                    _ => '.'
                 };
 
-                // Height in float
-                float targetHeight = ScreenHeight / (Math.Max(1, currentDistance));
+                int targetHeight = ScreenHeight / 
+                    Math.Max(1, distances[i]);
 
-                // Smooth height
-                float wallHeight = targetHeight;
+                // Walls sides
+                int wallHeight = targetHeight;
                 int wallWidth = segmentWidth;
 
+                // Walls centers
                 int widthCenter = (i * segmentWidth) + segmentWidth / 2;
                 int heightCenter = ScreenHeight / 2;
 
-                float halfHeight = wallHeight / 2f;
+                // Walls halfs
+                int halfHeight = wallHeight / 2;
                 int halfWidth = wallWidth / 2;
 
-
-                int yStart = (int)Math.Floor(heightCenter - halfHeight);
-                int yEnd = (int)Math.Ceiling(heightCenter + halfHeight);
+                int yStart = heightCenter - halfHeight;
+                int yEnd = heightCenter + halfHeight;
                 int xStart = Math.Max(0, widthCenter - halfWidth);
                 int xEnd = Math.Min(ScreenWidth - 1, widthCenter + halfWidth);
 
-                // Draw walls
+                // Add symbols to the buffer
                 for (int y = yStart; y < yEnd; y++)
                 {
                     for (int x = xStart; x < xEnd; x++)

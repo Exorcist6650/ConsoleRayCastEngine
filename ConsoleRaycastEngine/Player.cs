@@ -1,8 +1,7 @@
-﻿using ConsoleReycastEngine.core;
-using System;
+﻿using ConsoleRaycastEngine.core;
 using System.Numerics;
 
-namespace ConsoleReycastEngine
+namespace ConsoleRaycastEngine
 {
     public enum Direction : byte
     {

@@ -1,7 +1,7 @@
-﻿using ConsoleReycastEngine.core;
+﻿using ConsoleRaycastEngine.core;
 using System.Numerics;
 
-namespace ConsoleReycastEngine
+namespace ConsoleRaycastEngine
 {
     public enum CameraDirection : byte
     {
