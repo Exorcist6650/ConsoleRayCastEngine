@@ -115,6 +115,13 @@ namespace ConsoleRaycastEngine
               {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' }
             };
 
+            // Game configuration
+            float speed = float.Parse(ConfigurationReader.ReadValue("speed"));
+            int rotationSpeed = int.Parse(ConfigurationReader.ReadValue("rotation_speed"));
+            int FOV = int.Parse(ConfigurationReader.ReadValue("FOV"));
+            int raysAmount = int.Parse(ConfigurationReader.ReadValue("rays_amount"));
+
+
             // INITIALIZATION OBJECTS
 
             // Game map
@@ -127,22 +134,22 @@ namespace ConsoleRaycastEngine
             var cameraComponent = new CameraComponent(
                     location: playerLocation,
                     rotation: 0,
-                    rotationSpeed: 80,
+                    rotationSpeed: rotationSpeed,
                     viewDistance: 20,
-                    fieldOfView: 90);
-
+                    fieldOfView: FOV);
+    
             // Player
             var player = new Player(
                 cameraComponent,
                 location: playerLocation,
-                speed: 3f);
+                speed: speed);
 
             // Manager init
             var graphicsManager = new GraphicsManager(map, player);
             graphicsManager.Init();
 
-            DateTime lastTime = new();
             // Main loop
+            DateTime lastTime = new();
             while (true)
             {
                 // Delta time 
@@ -156,10 +163,11 @@ namespace ConsoleRaycastEngine
                 InputHandler(player, map, deltaSeconds);
 
                 // Calculate rays
-                var raysDistances = CalculateDistancesByRays(player, map, 60);
+                var raysDistances = CalculateDistancesByRays(
+                    player, map, raysAmount);
+
 
                 // RENDER
-
                 graphicsManager.ClearBuffer(); // Clear
 
                 // Add camera view in 3d

@@ -1,0 +1,6 @@
+{
+  "speed": 3,
+  "rotation_speed": 80,
+  "FOV": 90,
+  "rays_amount": 60
+}
